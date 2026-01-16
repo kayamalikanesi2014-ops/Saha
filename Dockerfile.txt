@@ -1,0 +1,11 @@
+# Hafif bir web sunucusu kullanıyoruz
+FROM nginx:alpine
+
+# HTML dosyanızı sunucunun içine kopyalıyoruz
+# Eğer dosyanızın adı index.html değilse, adını index.html yapın
+COPY . /usr/share/nginx/html
+
+# Standart web portunu açıyoruz
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
