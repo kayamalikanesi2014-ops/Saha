@@ -3,317 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Football Legendary ONLINE - BEKA STUDIO</title>
+    <title>Football Legendary - BEKA STUDIO</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         :root { --p1-color: #00d2ff; --p2-color: #ff416c; --field-green: #1a472a; --gold: #ffd700; }
         body { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; height: 100vh; touch-action: none; }
 
         #scoreboard { width: 100%; height: 50px; background: #111; display: flex; justify-content: space-around; align-items: center; border-bottom: 2px solid #333; z-index: 100; flex-shrink: 0; }
-        .score-val { font-size: 1.6rem; font-weight: 900; color: white; }
-        #match-tag { background: var(--gold); color: #000; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; border-radius: 4px; }
+        .score-val { font-size: 1.6rem; font-weight: 900; color: white; width: 50px; text-align: center; }
+        #match-tag { background: var(--gold); color: #000; padding: 2px 10px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; min-width: 60px; text-align: center; }
 
         #game-container { position: relative; width: 100vw; height: 65vh; background: var(--field-green); overflow: hidden; border-bottom: 2px solid #333; flex-shrink: 0; }
         canvas { width: 100%; height: 100%; display: block; }
 
-        #bottom-panel { width: 100%; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; }
-        #controls-row { width: 100%; display: none; justify-content: space-around; align-items: center; max-width: 500px; }
-        .ctrl-btn { width: 45%; height: 75px; background: #222; border: 1px solid #444; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; }
-
         .menu-layer { position: absolute; inset: 0; background: rgba(0,0,0,0.96); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 200; color: white; text-align: center; padding: 20px; }
-        .btn { padding: 12px; font-size: 0.85rem; cursor: pointer; border: none; color: white; border-radius: 8px; font-weight: bold; text-transform: uppercase; width: 260px; margin: 5px; }
-        .btn-green { background: #2e7d32; }
-        .btn-blue { background: #1565c0; }
-        .btn-gold { background: var(--gold); color: #000; }
-        .btn-red { background: #c62828; }
-        .btn-test { background: #607d8b; }
-
-        input { width: 260px; padding: 10px; border-radius: 5px; border: 1px solid var(--gold); background: #222; color: white; text-align: center; margin-bottom: 10px; }
-        .lobby-box { width: 280px; background: rgba(255,255,255,0.05); border: 1px solid #444; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
+        .chat-box { width: 260px; height: 120px; background: rgba(255,255,255,0.05); border: 1px solid #333; margin-bottom: 10px; overflow-y: auto; text-align: left; padding: 5px; font-size: 0.75rem; border-radius: 5px; }
         
-        #chat-area { width: 280px; height: 120px; background: #000; border: 1px solid #444; border-radius: 8px; display: flex; flex-direction: column; }
-        #chat-msgs, #ht-msgs { flex: 1; overflow-y: auto; padding: 5px; font-size: 0.7rem; text-align: left; scroll-behavior: smooth; }
-        #chat-input, #ht-input { width: 100%; background: #111; border: none; color: white; padding: 6px; box-sizing: border-box; }
+        .btn { padding: 12px; font-size: 0.85rem; cursor: pointer; border: none; color: white; border-radius: 8px; font-weight: bold; text-transform: uppercase; width: 260px; margin: 5px; }
+        .btn-green { background: #2e7d32; } .btn-blue { background: #1565c0; } .btn-gold { background: var(--gold); color: #000; } .btn-red { background: #c62828; } .btn-grey { background: #444; }
 
-        #credits-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 500; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        .credits-content { border: 2px solid var(--gold); padding: 25px; border-radius: 15px; background: #111; text-align: center; }
-        .beka-footer-btn { background: none; border: none; color: #444; font-size: 0.7rem; font-weight: bold; letter-spacing: 2px; margin-top: 10px; cursor: pointer; text-transform: uppercase; }
+        input, select { width: 260px; padding: 10px; border-radius: 5px; border: 1px solid var(--gold); background: #222; color: white; text-align: center; margin-bottom: 10px; }
+        
+        #bottom-panel { width: 100%; flex-grow: 1; display: none; flex-direction: column; align-items: center; justify-content: center; background: #000; position: relative; }
+        #controls-row { width: 100%; display: flex; justify-content: space-around; max-width: 500px; align-items: center; }
+        .ctrl-btn { width: 30%; height: 70px; background: rgba(255,255,255,0.1); border: 1px solid #444; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; }
+        
+        .beka-footer { 
+            color: var(--gold); 
+            font-size: 0.9rem; 
+            font-weight: bold; 
+            position: absolute; 
+            bottom: 10px; 
+            cursor: pointer; 
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); 
+            display: flex; 
+            gap: 20px;
+        }
+        .rules-btn { color: white; text-decoration: underline; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
-<div id="credits-modal" onclick="this.style.display='none'">
-    <div class="credits-content">
-        <h3 style="color:var(--gold)">YAPIMCILAR</h3>
-        <p>Belemir Leşkeri</p>
-        <p>Kaya Kaya</p>
-        <p style="font-size: 0.7rem; color: #888; border-top: 1px solid #333; margin-top: 15px; padding-top: 5px;">Programmer</p>
-        <p style="color: var(--p1-color); font-weight: bold;">Gemini</p>
-        <button class="btn btn-gold" style="width:100%; margin-top:15px;">KAPAT</button>
-    </div>
-</div>
-
 <div id="scoreboard">
-    <div class="score-val" id="s2-val" style="color:var(--p2-color)">0</div>
-    <div id="match-tag">LOBİ</div>
     <div class="score-val" id="s1-val" style="color:var(--p1-color)">0</div>
+    <div id="match-tag">LOBİ</div>
+    <div class="score-val" id="s2-val" style="color:var(--p2-color)">0</div>
 </div>
 
 <div id="game-container">
-    <div id="countdown" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:var(--gold); font-size:80px; font-weight:900; display:none; z-index:150;">3</div>
-
     <div id="main-menu" class="menu-layer">
-        <h2 style="color:var(--gold); margin-bottom:15px;">FOOTBALL LEGENDARY</h2>
+        <h2 style="color:var(--gold)">FOOTBALL LEGENDARY</h2>
         <input type="text" id="user-name" placeholder="ADINIZI YAZIN" maxlength="12">
         <button class="btn btn-green" onclick="initPeer(true)">ODA KUR</button>
-        <input type="text" id="join-id" placeholder="ODA ID GİRİN">
         <button class="btn btn-blue" onclick="initPeer(false)">ODAYA KATIL</button>
-        <button class="btn btn-test" onclick="startTestMode()">OYUNU TEST ET (BOT)</button>
+        <button class="btn btn-grey" onclick="showSubMenu(true)">DİĞER MODLAR</button>
+        <div class="beka-footer" style="position:relative; margin-top:20px;">
+            <span onclick="showCreators()">BEKA STUDIO</span>
+            <span class="rules-btn" onclick="showRules()">KURALLAR</span>
+        </div>
+    </div>
+
+    <div id="creators-layer" class="menu-layer" style="display:none">
+        <h2 style="color:var(--gold)">KURUCULAR</h2>
+        <p>Kaya Kaya</p><p>Belemir Leşkeri</p><p>Gemini</p>
+        <button class="btn btn-red" onclick="closeLayers()">GERİ</button>
+    </div>
+
+    <div id="rules-layer" class="menu-layer" style="display:none">
+        <h2 style="color:var(--gold)">OYUN KURALLARI</h2>
+        <p style="font-size:0.8rem">1. Mavi veya Kırmızı 3 gol atınca devre arası olur.</p>
+        <p style="font-size:0.8rem">2. Toplam 6 gol atan maçı kazanır.</p>
+        <p style="font-size:0.8rem">3. Her golden sonra 2 saniye geri sayılır.</p>
+        <button class="btn btn-red" onclick="closeLayers()">ANLADIM</button>
+    </div>
+
+    <div id="sub-menu" class="menu-layer" style="display:none">
+        <h3 style="color:var(--gold)">MODLAR</h3>
+        <button class="btn btn-blue" onclick="startTournament()">TURNUVA MODU</button>
+        <div style="margin: 10px 0;">
+            <select id="bot-level-select"><option value="0.05">KOLAY BOT</option><option value="0.10">NORMAL BOT</option><option value="0.15">ZOR BOT</option></select>
+            <button class="btn btn-green" onclick="startBotMatch()">BOTLA BAŞLAT</button>
+        </div>
+        <button class="btn btn-red" onclick="showSubMenu(false)">GERİ</button>
     </div>
 
     <div id="lobby-layer" class="menu-layer" style="display:none">
-        <div class="lobby-box">
-            <div style="font-size:0.75rem; margin-bottom:5px;">ODA ID: <b id="my-id-display" style="color:var(--gold)">...</b> <button onclick="copyID()" style="font-size:0.6rem;">KOPYALA</button></div>
-            <ul id="player-list" style="list-style:none; padding:0; margin:5px 0; font-size:0.85rem;"></ul>
-        </div>
-        <div id="chat-area"><div id="chat-msgs"></div><input type="text" id="chat-input" placeholder="Mesaj yaz..."></div>
-        <button id="start-btn" class="btn btn-gold" style="display:none;" onclick="hostStartGame()">OYUNU BAŞLAT</button>
-        <button class="btn btn-red" onclick="location.reload()">ÇIK</button>
+        <div id="id-area" style="font-size:0.8rem; margin-bottom:10px;">ID: ...</div>
+        <div class="chat-box" id="lobby-chat"></div>
+        <input type="text" id="lobby-input" placeholder="Mesaj yaz...">
+        <button id="start-btn" class="btn btn-gold" style="display:none" onclick="sendStartSignal()">MAÇI BAŞLAT</button>
+        <button class="btn btn-red" onclick="location.reload()">İPTAL</button>
     </div>
 
     <div id="halftime-layer" class="menu-layer" style="display:none">
         <h2 style="color:var(--gold)">DEVRE ARASI</h2>
-        <h3 id="halftime-timer" style="font-size:2rem;">02:00</h3>
-        <div id="ht-chat" style="width:260px; height:120px; background:#000; border:1px solid var(--gold); border-radius:8px; display:flex; flex-direction:column; margin-bottom:10px;">
-            <div id="ht-msgs"></div>
-            <input type="text" id="ht-input" placeholder="Strateji..." style="width:100%; background:#111; color:white; border:none; padding:8px; box-sizing:border-box;">
-        </div>
-        <p id="skip-hint" style="font-size:0.6rem; color:#666">/atla yazarak geçebilirsin</p>
+        <div class="chat-box" id="ht-chat"></div>
+        <input type="text" id="ht-input" placeholder="Mesaj yaz...">
+        <button class="btn btn-gold" onclick="resumeAfterHalftime()">DEVAM ET</button>
     </div>
 
-    <div id="end-menu" class="menu-layer" style="display:none">
-        <h2 id="winner-text" style="color:var(--gold)">KAZANDIN!</h2>
-        <button class="btn btn-gold" onclick="backToLobby()" id="back-lobby-btn">LOBİYE DÖN</button>
-        <button class="btn btn-blue" onclick="location.reload()">ANA MENÜ</button>
+    <div id="pause-layer" class="menu-layer" style="display:none; background:rgba(0,0,0,0.8)">
+        <h2 style="color:var(--gold)">DURAKLATILDI</h2>
+        <button class="btn btn-green" onclick="togglePause()">DEVAM ET</button>
+        <button class="btn btn-red" onclick="location.reload()">ANA MENÜYE DÖN</button>
     </div>
 
     <canvas id="game"></canvas>
+    <div id="countdown" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:var(--gold); font-size:80px; font-weight:900; display:none; z-index:300;">2</div>
 </div>
 
 <div id="bottom-panel">
-    <div id="controls-row"><div class="ctrl-btn" id="btn-left">◀</div><div class="ctrl-btn" id="btn-right">▶</div></div>
-    <button class="beka-footer-btn" onclick="document.getElementById('credits-modal').style.display='flex'">BEKA STUDIO</button>
+    <div id="controls-row">
+        <div class="ctrl-btn" id="btn-left">◀</div>
+        <div class="ctrl-btn" onclick="togglePause()">⏸</div>
+        <div class="ctrl-btn" id="btn-right">▶</div>
+    </div>
+    <div class="beka-footer">
+        <span onclick="showCreators()">BEKA STUDIO</span>
+        <span class="rules-btn" onclick="showRules()">KURALLAR</span>
+    </div>
 </div>
 
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
-let peer = null, conn = null, isHost = false, isTestMode = false, myName = "", opponentName = "Rakip";
-
-const sfx = {
-    gol: new Audio('gol.mp3'),
-    mavi: new Audio('mavi.mp3'),
-    kirmizi: new Audio('kirmizi.mp3')
-};
-
+let peer = null, conn = null, isHost = false, isBotMode = false, isHalftime = false, isPaused = false, gameActive = false, htDone = false;
+let score1 = 0, score2 = 0, botFactor = 0.05, scoreLock = false, inCountdown = false; 
 const pW = 100, pH = 18;
-let score1 = 0, score2 = 0, gameActive = false, inCountdown = false, isHalftime = false;
-let p1 = { x: 0, y: 0, dx: 0, color: "#00d2ff" }, p2 = { x: 0, y: 0, dx: 0, color: "#ff416c" }, ball = { x: -100, y: -100, dx: 4, dy: 4, r: 11 };
-let particles = [];
-let htInterval;
+let p1 = { x: 0, dx: 0, color: "#00d2ff" }, p2 = { x: 0, dx: 0, color: "#ff416c" }, ball = { x: -100, y: -100, dx: 0, dy: 0, r: 11 };
 
-function resize() {
-    canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
-    p1.x = p2.x = canvas.width / 2 - pW / 2; p1.y = canvas.height - 35; p2.y = 35;
-}
+function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; p1.x = p2.x = canvas.width/2 - pW/2; }
 window.addEventListener('resize', resize); resize();
 
-function createConfetti(x, y) {
-    for (let i = 0; i < 20; i++) {
-        particles.push({
-            x: x, y: y, dx: (Math.random() - 0.5) * 6, dy: (Math.random() - 0.5) * 6,
-            size: Math.random() * 4 + 2, color: `hsl(${Math.random() * 360}, 70%, 50%)`, life: 1.0
-        });
-    }
+function showSubMenu(show) { document.getElementById("main-menu").style.display = show ? "none" : "flex"; document.getElementById("sub-menu").style.display = show ? "flex" : "none"; }
+function showCreators() { document.getElementById("creators-layer").style.display = "flex"; }
+function showRules() { document.getElementById("rules-layer").style.display = "flex"; }
+function closeLayers() { document.getElementById("creators-layer").style.display = "none"; document.getElementById("rules-layer").style.display = "none"; }
+function togglePause() { if(!gameActive || isHalftime || inCountdown) return; isPaused = !isPaused; document.getElementById("pause-layer").style.display = isPaused ? "flex" : "none"; }
+
+function addMsg(boxId, msg) {
+    const box = document.getElementById(boxId);
+    if(box) { const div = document.createElement("div"); div.innerText = msg; box.appendChild(div); box.scrollTop = box.scrollHeight; }
 }
 
-function startTestMode() {
-    isTestMode = true; isHost = false; myName = "Test Kullanıcı"; opponentName = "Yapay Zeka";
+function initPeer(host) {
+    isHost = host; peer = new Peer();
     document.getElementById("main-menu").style.display = "none";
-    document.getElementById("controls-row").style.display = "flex";
-    document.getElementById("match-tag").innerText = "TEST MAÇI";
-    document.getElementById("back-lobby-btn").style.display = "none";
-    gameActive = true; runMatchCountdown();
-}
-
-function initPeer(hostMode) {
-    isTestMode = false; myName = document.getElementById("user-name").value.trim() || "Oyuncu";
-    isHost = hostMode; peer = new Peer();
-    peer.on('open', (id) => {
-        document.getElementById("main-menu").style.display = "none";
-        document.getElementById("lobby-layer").style.display = "flex";
-        document.getElementById("my-id-display").innerText = id;
-        updatePlayerList();
-        if (!isHost) {
-            const tId = document.getElementById("join-id").value;
-            conn = peer.connect(tId, { metadata: { name: myName } });
-            setupConnection();
-        }
+    document.getElementById("lobby-layer").style.display = "flex";
+    peer.on('open', (id) => { 
+        document.getElementById("id-area").innerText = "ID: " + id;
+        if(!isHost) { const t = prompt("ID:"); if(t) { conn = peer.connect(t); setupConn(); } else location.reload(); }
     });
-    peer.on('connection', (c) => { conn = c; opponentName = c.metadata.name; setupConnection(); setTimeout(() => conn.send({ type: 'lobby_update', name: myName }), 500); });
+    peer.on('connection', (c) => { conn = c; setupConn(); addMsg("lobby-chat", "Rakip bağlandı!"); if(isHost) document.getElementById("start-btn").style.display = "block"; });
 }
 
-function setupConnection() {
-    conn.on('open', () => { updatePlayerList(); if (isHost) document.getElementById("start-btn").style.display = "block"; });
+function setupConn() {
     conn.on('data', (data) => {
-        if (data.type === 'lobby_update') { opponentName = data.name; updatePlayerList(); }
-        if (data.type === 'chat') handleIncomingChat(opponentName, data.msg);
-        if (data.type === 'start_signal' || data.type === 'reset_signal') { isHalftime = false; runMatchCountdown(); }
-        if (data.type === 'move') p2.x = canvas.width - data.x - pW;
-        if (data.type === 'ball') { ball.x = canvas.width - data.x; ball.y = canvas.height - data.y; }
-        if (data.type === 'score') { score1 = data.s1; score2 = data.s2; updateScoreUI(); }
-        if (data.type === 'halftime') startHalftimeUI();
-        if (data.type === 'skip_halftime') skipHalftime();
-        if (data.type === 'win') { sfx[data.winnerSide].play(); showEndScreen(data.winner); }
-        if (data.type === 'back_to_lobby') { document.getElementById("end-menu").style.display = "none"; document.getElementById("lobby-layer").style.display = "flex"; gameActive = false; }
-        if (data.type === 'confetti') createConfetti(canvas.width - data.x, canvas.height - data.y);
+        if(data.type === 'start') runStartCountdown();
+        if(data.type === 'move') p2.x = canvas.width - data.x - pW;
+        if(data.type === 'ball') { ball.x = canvas.width - data.x; ball.y = canvas.height - data.y; }
+        if(data.type === 'score') { score1 = data.s1; score2 = data.s2; updateScoreUI(); }
+        if(data.type === 'chat') { addMsg(data.box, "R: " + data.msg); }
     });
 }
 
-function handleIncomingChat(user, msg) { addChat(user, msg, "chat-msgs"); addChat(user, msg, "ht-msgs"); }
-function updatePlayerList() { const list = document.getElementById("player-list"); list.innerHTML = `<li>${myName} (Host)</li>`; if (conn && conn.open) list.innerHTML += `<li>${opponentName} (Katıldı)</li>`; }
+const handleMsg = (e, boxId) => {
+    if(e.key === "Enter" && e.target.value.trim() !== "") {
+        const msg = e.target.value;
+        addMsg(boxId, "Siz: " + msg);
+        if(conn) conn.send({type: 'chat', msg: msg, box: boxId});
+        e.target.value = "";
+    }
+};
 
-[document.getElementById("chat-input"), document.getElementById("ht-input")].forEach(input => {
-    input.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") {
-            const msg = e.target.value.trim();
-            if (!msg) return;
-            // /atla kontrolü: Host veya Test modunda ise çalışır
-            if (msg === "/atla" && isHalftime && (isHost || isTestMode)) {
-                skipHalftime();
-                if(conn) conn.send({type: 'skip_halftime'});
-            } else {
-                if(conn) conn.send({ type: 'chat', msg: msg });
-                addChat(myName, msg, "chat-msgs"); addChat(myName, msg, "ht-msgs");
-            }
-            e.target.value = "";
-        }
-    });
-});
+document.getElementById("lobby-input").onkeypress = (e) => handleMsg(e, "lobby-chat");
+document.getElementById("ht-input").onkeypress = (e) => handleMsg(e, "ht-chat");
 
-function skipHalftime() {
-    isHalftime = false; clearInterval(htInterval);
-    if(isHost || isTestMode) hostStartGame(); 
+function sendStartSignal() { if(conn) conn.send({type:'start'}); runStartCountdown(); }
+function startBotMatch() { isBotMode = true; botFactor = parseFloat(document.getElementById("bot-level-select").value); runStartCountdown(); }
+function startTournament() { isBotMode = true; botFactor = 0.13; runStartCountdown(); }
+
+function runStartCountdown() {
+    document.getElementById("main-menu").style.display = "none";
+    document.getElementById("sub-menu").style.display = "none";
+    document.getElementById("lobby-layer").style.display = "none";
+    document.getElementById("bottom-panel").style.display = "flex";
+    document.getElementById("match-tag").innerText = "MAÇTA";
+    gameActive = true;
+    startCountdownTimer();
 }
 
-function addChat(user, msg, boxId) { const box = document.getElementById(boxId); if(!box) return; box.innerHTML += `<div><b style="color:var(--gold)">${user}:</b> ${msg}</div>`; box.scrollTop = box.scrollHeight; }
-function copyID() { navigator.clipboard.writeText(document.getElementById("my-id-display").innerText).then(() => alert("Kopyalandı!")); }
-
-function hostStartGame() {
-    if (!isTestMode && (!conn || !conn.open)) return alert("Rakip bekleniyor!");
-    if (conn) conn.send({ type: 'start_signal' });
-    runMatchCountdown();
-}
-
-function runMatchCountdown() {
-    document.getElementById("lobby-layer").style.display = "none"; document.getElementById("halftime-layer").style.display = "none";
-    document.getElementById("controls-row").style.display = "flex";
-    inCountdown = true; gameActive = true; isHalftime = false;
-    const cd = document.getElementById("countdown"); cd.style.display = "block";
-    let count = 3; cd.innerText = count;
-    let timer = setInterval(() => {
+function startCountdownTimer() {
+    inCountdown = true; scoreLock = true;
+    ball.x = -100; ball.y = -100;
+    const cd = document.getElementById("countdown");
+    cd.style.display = "block";
+    let count = 2; cd.innerText = count;
+    let t = setInterval(() => {
         count--;
-        if (count <= 0) { 
-            clearInterval(timer); cd.style.display = "none"; inCountdown = false; 
-            if (isHost || isTestMode) { ball.x = canvas.width/2; ball.y = canvas.height/2; ball.dy = 4.5; ball.dx = (Math.random()-0.5)*5; } 
-        } else cd.innerText = count;
+        if(count > 0) cd.innerText = count;
+        if(count <= 0) {
+            clearInterval(t); cd.style.display = "none"; inCountdown = false;
+            if(isHost || isBotMode) {
+                ball.x = canvas.width / 2; ball.y = canvas.height / 2;
+                ball.dy = 4.5; ball.dx = (Math.random() - 0.5) * 6;
+                scoreLock = false;
+            }
+        }
     }, 1000);
 }
 
-function startHalftimeUI() {
-    isHalftime = true; gameActive = false; document.getElementById("halftime-layer").style.display = "flex"; document.getElementById("match-tag").innerText = "DEVRE";
-    let time = 120; const timerDisplay = document.getElementById("halftime-timer");
-    htInterval = setInterval(() => {
-        if (!isHalftime) { clearInterval(htInterval); return; }
-        time--; let min = Math.floor(time / 60), sec = time % 60;
-        timerDisplay.innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-        if (time <= 0) { skipHalftime(); }
-    }, 1000);
+function resumeAfterHalftime() {
+    document.getElementById("halftime-layer").style.display = "none";
+    isHalftime = false;
+    startCountdownTimer();
 }
-
-function updateScoreUI() { document.getElementById("s1-val").innerText = score1; document.getElementById("s2-val").innerText = score2; }
 
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "rgba(255,255,255,0.1)"; ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
-    ctx.beginPath(); ctx.moveTo(0, canvas.height/2); ctx.lineTo(canvas.width, canvas.height/2); ctx.stroke();
-    
-    for (let i = particles.length - 1; i >= 0; i--) {
-        let p = particles[i]; p.x += p.dx; p.y += p.dy; p.life -= 0.02;
-        if (p.life <= 0) particles.splice(i, 1);
-        else { ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.size, p.size); ctx.globalAlpha = 1; }
-    }
-
-    if (gameActive && !inCountdown && !isHalftime) {
+    if(gameActive && !isHalftime && !isPaused && !inCountdown) {
         p1.x += p1.dx; p1.x = Math.max(0, Math.min(canvas.width - pW, p1.x));
-        if (conn && conn.open) conn.send({ type: 'move', x: p1.x });
-        
-        if (isTestMode) p2.x += (ball.x - (p2.x + pW / 2)) * 0.08;
+        if(conn) conn.send({type: 'move', x: p1.x});
+        if(isBotMode) { p2.x += (ball.x - (p2.x + pW/2)) * botFactor; p2.x = Math.max(0, Math.min(canvas.width - pW, p2.x)); }
 
-        if (isHost || isTestMode) {
+        if(isHost || isBotMode) {
             ball.x += ball.dx; ball.y += ball.dy;
-            if (ball.x <= ball.r || ball.x >= canvas.width - ball.r) ball.dx *= -1;
-
-            if (ball.y + ball.r > p1.y && ball.x > p1.x && ball.x < p1.x + pW) {
-                let impact = (ball.x - (p1.x + pW / 2)) / (pW / 2);
-                ball.dx = impact * 5; ball.dy = -Math.abs(ball.dy);
-            }
-            if (ball.y - ball.r < p2.y + pH && ball.x > p2.x && ball.x < p2.x + pW) {
-                let impact = (ball.x - (p2.x + pW / 2)) / (pW / 2);
-                ball.dx = impact * 5; ball.dy = Math.abs(ball.dy);
-            }
+            if(ball.x <= ball.r || ball.x >= canvas.width - ball.r) ball.dx *= -1;
+            if(ball.y + ball.r > canvas.height - 35 && ball.x > p1.x && ball.x < p1.x + pW) ball.dy = -Math.abs(ball.dy);
+            if(ball.y - ball.r < 35 + pH && ball.x > p2.x && ball.x < p2.x + pW) ball.dy = Math.abs(ball.dy);
             
-            if (ball.y < 0) { 
-                score1++; sfx.gol.play(); createConfetti(ball.x, 0); 
-                if(conn) conn.send({type:'confetti', x: ball.x, y: 0});
-                checkScore(); 
+            if(!scoreLock) {
+                if(ball.y < 0) { score1++; checkScore(); }
+                else if(ball.y > canvas.height) { score2++; checkScore(); }
             }
-            if (ball.y > canvas.height) { 
-                score2++; sfx.gol.play(); createConfetti(ball.x, canvas.height);
-                if(conn) conn.send({type:'confetti', x: ball.x, y: canvas.height});
-                checkScore(); 
-            }
-            if (conn && conn.open) conn.send({ type: 'ball', x: ball.x, y: ball.y });
+            if(conn) conn.send({type: 'ball', x: ball.x, y: ball.y});
         }
     }
-    ctx.fillStyle = p1.color; ctx.fillRect(p1.x, p1.y, pW, pH);
-    ctx.fillStyle = p2.color; ctx.fillRect(p2.x, p2.y, pW, pH);
-    if (ball.x > 0) { ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2); ctx.fill(); }
+    ctx.fillStyle = p1.color; ctx.fillRect(p1.x, canvas.height - 35, pW, pH);
+    ctx.fillStyle = p2.color; ctx.fillRect(p2.x, 35, pW, pH);
+    ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2); ctx.fill();
     requestAnimationFrame(gameLoop);
 }
 
 function checkScore() {
-    updateScoreUI(); if (conn && conn.open) conn.send({ type: 'score', s1: score1, s2: score2 });
-    if ((score1 + score2) === 3) { if (isHost) conn.send({ type: 'halftime' }); startHalftimeUI(); }
-    else if (score1 >= 6 || score2 >= 6) { 
-        const wN = score1 >= 6 ? myName : opponentName;
-        const wS = score1 >= 6 ? 'mavi' : 'kirmizi';
-        sfx[wS].play();
-        showEndScreen(wN); if(conn) conn.send({ type: 'win', winner: wN, winnerSide: wS }); 
+    scoreLock = true;
+    updateScoreUI();
+    if(conn) conn.send({type: 'score', s1: score1, s2: score2});
+
+    if((score1 === 3 || score2 === 3) && !htDone) {
+        htDone = true; isHalftime = true;
+        document.getElementById("halftime-layer").style.display = "flex";
+    } else if(score1 >= 6 || score2 >= 6) {
+        alert("MAÇ BİTTİ!"); location.reload();
+    } else {
+        setTimeout(startCountdownTimer, 500);
     }
-    else { if (isHost) conn.send({ type: 'reset_signal' }); runMatchCountdown(); }
 }
 
-function showEndScreen(name) { gameActive = false; document.getElementById("halftime-layer").style.display = "none"; document.getElementById("end-menu").style.display = "flex"; document.getElementById("winner-text").innerText = name.toUpperCase() + " KAZANDI!"; document.getElementById("controls-row").style.display = "none"; }
-function backToLobby() { document.getElementById("end-menu").style.display = "none"; document.getElementById("lobby-layer").style.display = "flex"; score1 = 0; score2 = 0; updateScoreUI(); if(conn) conn.send({type: 'back_to_lobby'}); }
+function updateScoreUI() {
+    document.getElementById("s1-val").innerText = score1;
+    document.getElementById("s2-val").innerText = score2;
+}
 
-const move = (v) => p1.dx = v;
-document.getElementById("btn-left").addEventListener("touchstart", (e) => { e.preventDefault(); move(-10); });
-document.getElementById("btn-right").addEventListener("touchstart", (e) => { e.preventDefault(); move(10); });
-document.getElementById("btn-left").addEventListener("touchend", () => move(0));
-document.getElementById("btn-right").addEventListener("touchend", () => move(0));
-
+const setupBtn = (id, val) => {
+    const el = document.getElementById(id);
+    el.ontouchstart = (e) => { e.preventDefault(); p1.dx = val; };
+    el.ontouchend = () => p1.dx = 0;
+};
+setupBtn("btn-left", -10); setupBtn("btn-right", 10);
 requestAnimationFrame(gameLoop);
 </script>
 </body>
-</html>
+                                                                                   </html>
