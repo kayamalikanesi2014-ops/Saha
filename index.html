@@ -8,28 +8,20 @@
     <style>
         :root { --p1-color: #00d2ff; --p2-color: #ff416c; --field-green: #1a472a; --gold: #ffd700; }
         body { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; height: 100vh; touch-action: none; }
-
         #scoreboard { width: 100%; height: 50px; background: #111; display: flex; justify-content: space-around; align-items: center; border-bottom: 2px solid #333; z-index: 100; flex-shrink: 0; }
         .score-val { font-size: 1.6rem; font-weight: 900; color: white; width: 50px; text-align: center; }
         #match-tag { background: var(--gold); color: #000; padding: 2px 10px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; min-width: 60px; text-align: center; }
-
         #game-container { position: relative; width: 100vw; height: 65vh; background: var(--field-green); overflow: hidden; border-bottom: 2px solid #333; flex-shrink: 0; }
         canvas { width: 100%; height: 100%; display: block; }
-
         .menu-layer { position: absolute; inset: 0; background: rgba(0,0,0,0.96); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 200; color: white; text-align: center; padding: 20px; }
         .chat-box { width: 260px; height: 120px; background: rgba(255,255,255,0.05); border: 1px solid #333; margin-bottom: 10px; overflow-y: auto; text-align: left; padding: 5px; font-size: 0.75rem; border-radius: 5px; }
-        
         .btn { padding: 12px; font-size: 0.85rem; cursor: pointer; border: none; color: white; border-radius: 8px; font-weight: bold; text-transform: uppercase; width: 260px; margin: 5px; }
         .btn-green { background: #2e7d32; } .btn-blue { background: #1565c0; } .btn-gold { background: var(--gold); color: #000; } .btn-red { background: #c62828; } .btn-grey { background: #444; }
-
         input, select { width: 260px; padding: 10px; border-radius: 5px; border: 1px solid var(--gold); background: #222; color: white; text-align: center; margin-bottom: 10px; }
-        
         #bottom-panel { width: 100%; flex-grow: 1; display: none; flex-direction: column; align-items: center; justify-content: center; background: #000; position: relative; }
         #controls-row { width: 100%; display: flex; justify-content: space-around; max-width: 500px; align-items: center; }
         .ctrl-btn { width: 30%; height: 70px; background: rgba(255,255,255,0.1); border: 1px solid #444; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; }
-        
         .beka-footer { color: var(--gold); font-size: 0.9rem; font-weight: bold; position: absolute; bottom: 10px; cursor: pointer; text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); display: flex; gap: 20px; }
-        .rules-btn { color: white; text-decoration: underline; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -49,13 +41,27 @@
         <button class="btn btn-grey" onclick="showSubMenu(true)">DİĞER MODLAR</button>
         <div class="beka-footer" style="position:relative; margin-top:20px;">
             <span onclick="showCreators()">BEKA STUDIO</span>
-            <span class="rules-btn" onclick="showRules()">KURALLAR</span>
+            <span onclick="showRules()" style="color:white; text-decoration:underline; font-size:0.8rem;">KURALLAR</span>
         </div>
+    </div>
+
+    <div id="sub-menu" class="menu-layer" style="display:none">
+        <h3 style="color:var(--gold)">MODLAR</h3>
+        <button class="btn btn-blue" onclick="startTournament()">TURNUVA MODU</button>
+        <div style="margin: 10px 0;">
+            <select id="bot-level-select">
+                <option value="0.05">KOLAY BOT</option>
+                <option value="0.10">NORMAL BOT</option>
+                <option value="0.15">ZOR BOT</option>
+            </select>
+            <button class="btn btn-green" onclick="startBotMatch()">BOTLA BAŞLAT</button>
+        </div>
+        <button class="btn btn-red" onclick="showSubMenu(false)">GERİ</button>
     </div>
 
     <div id="creators-layer" class="menu-layer" style="display:none">
         <h2 style="color:var(--gold)">KURUCULAR</h2>
-        <p>Kaya Kaya</p><p>Gemini</p>
+        <p>Kaya Kaya</p><p>Beloş</p><p>Gemini</p>
         <button class="btn btn-red" onclick="closeLayers()">GERİ</button>
     </div>
 
@@ -65,16 +71,6 @@
         <p>2. 6 gol atan kazanır.</p>
         <p>3. Her golden sonra 2 saniye geri sayım olur.</p>
         <button class="btn btn-red" onclick="closeLayers()">ANLADIM</button>
-    </div>
-
-    <div id="sub-menu" class="menu-layer" style="display:none">
-        <h3 style="color:var(--gold)">MODLAR</h3>
-        <button class="btn btn-blue" onclick="startTournament()">TURNUVA MODU</button>
-        <div style="margin: 10px 0;">
-            <select id="bot-level-select"><option value="0.05">KOLAY BOT</option><option value="0.10">NORMAL BOT</option><option value="0.15">ZOR BOT</option></select>
-            <button class="btn btn-green" onclick="startBotMatch()">BOTLA BAŞLAT</button>
-        </div>
-        <button class="btn btn-red" onclick="showSubMenu(false)">GERİ</button>
     </div>
 
     <div id="lobby-layer" class="menu-layer" style="display:none">
@@ -103,22 +99,14 @@
 </div>
 
 <div id="bottom-panel">
-    <div id="controls-row">
-        <div class="ctrl-btn" id="btn-left">◀</div>
-        <div class="ctrl-btn" onclick="togglePause()">⏸</div>
-        <div class="ctrl-btn" id="btn-right">▶</div>
-    </div>
-    <div class="beka-footer">
-        <span onclick="showCreators()">BEKA STUDIO</span>
-        <span class="rules-btn" onclick="showRules()">KURALLAR</span>
-    </div>
+    <div id="controls-row"><div class="ctrl-btn" id="btn-left">◀</div><div class="ctrl-btn" onclick="togglePause()">⏸</div><div class="ctrl-btn" id="btn-right">▶</div></div>
 </div>
 
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 let peer = null, conn = null, isHost = false, isBotMode = false, isHalftime = false, isPaused = false, gameActive = false, htDone = false;
-let score1 = 0, score2 = 0, botFactor = 0.05, scoreLock = false, inCountdown = false; 
+let score1 = 0, score2 = 0, botFactor = 0.08, scoreLock = false, inCountdown = false; 
 const pW = 100, pH = 18;
 let p1 = { x: 0, dx: 0, color: "#00d2ff" }, p2 = { x: 0, dx: 0, color: "#ff416c" }, ball = { x: -100, y: -100, dx: 0, dy: 0, r: 11 };
 
@@ -131,120 +119,53 @@ function showRules() { document.getElementById("rules-layer").style.display = "f
 function closeLayers() { document.getElementById("creators-layer").style.display = "none"; document.getElementById("rules-layer").style.display = "none"; }
 function togglePause() { if(!gameActive || isHalftime || inCountdown) return; isPaused = !isPaused; document.getElementById("pause-layer").style.display = isPaused ? "flex" : "none"; }
 
-function addMsg(boxId, msg) {
-    const box = document.getElementById(boxId);
-    if(box) { const div = document.createElement("div"); div.innerText = msg; box.appendChild(div); box.scrollTop = box.scrollHeight; }
-}
-
 function initPeer(host) {
-    isHost = host;
-    // Peer nesnesini oluştur
-    peer = new Peer();
-    
+    isHost = host; peer = new Peer();
     document.getElementById("main-menu").style.display = "none";
     document.getElementById("lobby-layer").style.display = "flex";
-
-    peer.on('open', (id) => {
-        if(isHost) {
-            // Sadece kurucuda ID'yi göster
-            document.getElementById("id-area").innerText = "ODA ID: " + id;
-        } else {
-            // Katılan tarafta ID yazısını gizle ve ID sor
-            document.getElementById("id-area").style.display = "none";
-            const targetId = prompt("KATILMAK İSTEDİĞİNİZ ODA ID:");
-            if(targetId) {
-                conn = peer.connect(targetId);
-                setupConn();
-            } else {
-                location.reload();
-            }
-        }
-    });
-
-    peer.on('connection', (c) => {
-        conn = c;
-        setupConn();
-        addMsg("lobby-chat", "SİSTEM: Rakip bağlandı!");
-        if(isHost) document.getElementById("start-btn").style.display = "block";
-    });
-
-    peer.on('error', (err) => {
-        alert("Bağlantı Hatası: " + err.type);
-        location.reload();
-    });
+    peer.on('open', (id) => { if(isHost) document.getElementById("id-area").innerText = "ODA ID: " + id; else { document.getElementById("id-area").style.display = "none"; const t = prompt("ODA ID:"); if(t) { conn = peer.connect(t); setupConn(); } else location.reload(); }});
+    peer.on('connection', (c) => { conn = c; setupConn(); if(isHost) document.getElementById("start-btn").style.display = "block"; });
 }
 
 function setupConn() {
-    conn.on('open', () => {
-        if(!isHost) addMsg("lobby-chat", "SİSTEM: Odaya bağlanıldı!");
-    });
     conn.on('data', (data) => {
         if(data.type === 'start') runStartCountdown();
         if(data.type === 'move') p2.x = canvas.width - data.x - pW;
         if(data.type === 'ball') { ball.x = canvas.width - data.x; ball.y = canvas.height - data.y; }
         if(data.type === 'score') { score1 = data.s1; score2 = data.s2; updateScoreUI(); }
-        if(data.type === 'chat') { addMsg(data.box, "R: " + data.msg); }
+        if(data.type === 'chat') addMsg(data.box, "R: " + data.msg);
     });
 }
 
-const handleMsg = (e, boxId) => {
-    if(e.key === "Enter" && e.target.value.trim() !== "") {
-        const msg = e.target.value;
-        addMsg(boxId, "Siz: " + msg);
-        if(conn) conn.send({type: 'chat', msg: msg, box: boxId});
-        e.target.value = "";
-    }
-};
+const handleMsg = (e, boxId) => { if(e.key === "Enter" && e.target.value.trim() !== "") { const msg = e.target.value; addMsg(boxId, "Siz: " + msg); if(conn) conn.send({type: 'chat', msg: msg, box: boxId}); e.target.value = ""; }};
 document.getElementById("lobby-input").onkeypress = (e) => handleMsg(e, "lobby-chat");
 document.getElementById("ht-input").onkeypress = (e) => handleMsg(e, "ht-chat");
 
-function sendStartSignal() { if(conn) conn.send({type:'start'}); runStartCountdown(); }
-function startBotMatch() { isBotMode = true; botFactor = parseFloat(document.getElementById("bot-level-select").value); runStartCountdown(); }
-function startTournament() { isBotMode = true; botFactor = 0.13; runStartCountdown(); }
-
-function runStartCountdown() {
+function runStartCountdown() { 
     document.getElementById("main-menu").style.display = "none";
     document.getElementById("sub-menu").style.display = "none";
-    document.getElementById("lobby-layer").style.display = "none";
-    document.getElementById("bottom-panel").style.display = "flex";
-    document.getElementById("match-tag").innerText = "MAÇTA";
-    gameActive = true;
-    startCountdownTimer();
+    document.getElementById("lobby-layer").style.display = "none"; 
+    document.getElementById("bottom-panel").style.display = "flex"; 
+    document.getElementById("match-tag").innerText = "MAÇTA"; 
+    gameActive = true; startCountdownTimer(); 
 }
 
 function startCountdownTimer() {
-    inCountdown = true; scoreLock = true;
-    ball.x = -100; ball.y = -100;
-    const cd = document.getElementById("countdown");
-    cd.style.display = "block";
+    inCountdown = true; scoreLock = true; ball.x = -100;
+    const cd = document.getElementById("countdown"); cd.style.display = "block";
     let count = 2; cd.innerText = count;
     let t = setInterval(() => {
-        count--;
-        if(count > 0) cd.innerText = count;
-        if(count <= 0) {
-            clearInterval(t); cd.style.display = "none"; inCountdown = false;
-            if(isHost || isBotMode) {
-                ball.x = canvas.width / 2; ball.y = canvas.height / 2;
-                ball.dy = 4.5; ball.dx = (Math.random() - 0.5) * 6;
-                scoreLock = false;
-            }
-        }
+        count--; if(count > 0) cd.innerText = count;
+        if(count <= 0) { clearInterval(t); cd.style.display = "none"; inCountdown = false; if(isHost || isBotMode) { ball.x = canvas.width/2; ball.y = canvas.height/2; ball.dy = 5; ball.dx = (Math.random()-0.5)*7; scoreLock = false; } }
     }, 1000);
-}
-
-function resumeAfterHalftime() {
-    document.getElementById("halftime-layer").style.display = "none";
-    isHalftime = false;
-    startCountdownTimer();
 }
 
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if(gameActive && !isHalftime && !isPaused && !inCountdown) {
         p1.x += p1.dx; p1.x = Math.max(0, Math.min(canvas.width - pW, p1.x));
-        if(conn) conn.send({type: 'move', x: p1.x});
+        if(conn && p1.dx !== 0) conn.send({type: 'move', x: p1.x});
         if(isBotMode) { p2.x += (ball.x - (p2.x + pW/2)) * botFactor; p2.x = Math.max(0, Math.min(canvas.width - pW, p2.x)); }
-
         if(isHost || isBotMode) {
             ball.x += ball.dx; ball.y += ball.dy;
             if(ball.x <= ball.r || ball.x >= canvas.width - ball.r) ball.dx *= -1;
@@ -264,27 +185,23 @@ function gameLoop() {
 }
 
 function checkScore() {
-    scoreLock = true;
-    updateScoreUI();
+    scoreLock = true; updateScoreUI();
     if(conn) conn.send({type: 'score', s1: score1, s2: score2});
-    if((score1 === 3 || score2 === 3) && !htDone) {
-        htDone = true; isHalftime = true;
-        document.getElementById("halftime-layer").style.display = "flex";
-    } else if(score1 >= 6 || score2 >= 6) {
-        alert("MAÇ BİTTİ!"); location.reload();
-    } else {
-        setTimeout(startCountdownTimer, 500);
-    }
+    if((score1 === 3 || score2 === 3) && !htDone) { htDone = true; isHalftime = true; document.getElementById("halftime-layer").style.display = "flex"; }
+    else if(score1 >= 6 || score2 >= 6) { alert("MAÇ BİTTİ!"); location.reload(); }
+    else setTimeout(startCountdownTimer, 500);
 }
-function updateScoreUI() { document.getElementById("s1-val").innerText = score1; document.getElementById("s2-val").innerText = score2; }
 
-const setupBtn = (id, val) => {
-    const el = document.getElementById(id);
-    el.ontouchstart = (e) => { e.preventDefault(); p1.dx = val; };
-    el.ontouchend = () => p1.dx = 0;
-};
-setupBtn("btn-left", -10); setupBtn("btn-right", 10);
+function updateScoreUI() { document.getElementById("s1-val").innerText = score1; document.getElementById("s2-val").innerText = score2; }
+function addMsg(boxId, msg) { const box = document.getElementById(boxId); if(box) { const div = document.createElement("div"); div.innerText = msg; box.appendChild(div); box.scrollTop = box.scrollHeight; }}
+function sendStartSignal() { if(conn) conn.send({type:'start'}); runStartCountdown(); }
+function startBotMatch() { isBotMode = true; botFactor = parseFloat(document.getElementById("bot-level-select").value); runStartCountdown(); }
+function startTournament() { isBotMode = true; botFactor = 0.13; runStartCountdown(); }
+function resumeAfterHalftime() { document.getElementById("halftime-layer").style.display = "none"; isHalftime = false; startCountdownTimer(); }
+
+const setupBtn = (id, val) => { const el = document.getElementById(id); el.ontouchstart = (e) => { e.preventDefault(); p1.dx = val; }; el.ontouchend = () => p1.dx = 0; };
+setupBtn("btn-left", -12); setupBtn("btn-right", 12);
 requestAnimationFrame(gameLoop);
 </script>
 </body>
-        </html>
+                                                                                                                               </html>
