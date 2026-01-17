@@ -28,17 +28,7 @@
         #controls-row { width: 100%; display: flex; justify-content: space-around; max-width: 500px; align-items: center; }
         .ctrl-btn { width: 30%; height: 70px; background: rgba(255,255,255,0.1); border: 1px solid #444; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; }
         
-        .beka-footer { 
-            color: var(--gold); 
-            font-size: 0.9rem; 
-            font-weight: bold; 
-            position: absolute; 
-            bottom: 10px; 
-            cursor: pointer; 
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); 
-            display: flex; 
-            gap: 20px;
-        }
+        .beka-footer { color: var(--gold); font-size: 0.9rem; font-weight: bold; position: absolute; bottom: 10px; cursor: pointer; text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); display: flex; gap: 20px; }
         .rules-btn { color: white; text-decoration: underline; font-size: 0.8rem; }
     </style>
 </head>
@@ -65,15 +55,15 @@
 
     <div id="creators-layer" class="menu-layer" style="display:none">
         <h2 style="color:var(--gold)">KURUCULAR</h2>
-        <p>Kaya Kaya</p><p>Belemir Leşkeri</p><p>Gemini</p>
+        <p>Kaya Kaya</p><p>Gemini</p>
         <button class="btn btn-red" onclick="closeLayers()">GERİ</button>
     </div>
 
     <div id="rules-layer" class="menu-layer" style="display:none">
         <h2 style="color:var(--gold)">OYUN KURALLARI</h2>
-        <p style="font-size:0.8rem">1. Mavi veya Kırmızı 3 gol atınca devre arası olur.</p>
-        <p style="font-size:0.8rem">2. Toplam 6 gol atan maçı kazanır.</p>
-        <p style="font-size:0.8rem">3. Her golden sonra 2 saniye geri sayılır.</p>
+        <p>1. 3 gol atan taraf devre arasına gider.</p>
+        <p>2. 6 gol atan kazanır.</p>
+        <p>3. Her golden sonra 2 saniye geri sayım olur.</p>
         <button class="btn btn-red" onclick="closeLayers()">ANLADIM</button>
     </div>
 
@@ -88,7 +78,7 @@
     </div>
 
     <div id="lobby-layer" class="menu-layer" style="display:none">
-        <div id="id-area" style="font-size:0.8rem; margin-bottom:10px;">ID: ...</div>
+        <div id="id-area" style="font-size:1.1rem; color:var(--gold); margin-bottom:15px; font-weight:bold;">ID BEKLENİYOR...</div>
         <div class="chat-box" id="lobby-chat"></div>
         <input type="text" id="lobby-input" placeholder="Mesaj yaz...">
         <button id="start-btn" class="btn btn-gold" style="display:none" onclick="sendStartSignal()">MAÇI BAŞLAT</button>
@@ -147,17 +137,47 @@ function addMsg(boxId, msg) {
 }
 
 function initPeer(host) {
-    isHost = host; peer = new Peer();
+    isHost = host;
+    // Peer nesnesini oluştur
+    peer = new Peer();
+    
     document.getElementById("main-menu").style.display = "none";
     document.getElementById("lobby-layer").style.display = "flex";
-    peer.on('open', (id) => { 
-        document.getElementById("id-area").innerText = "ID: " + id;
-        if(!isHost) { const t = prompt("ID:"); if(t) { conn = peer.connect(t); setupConn(); } else location.reload(); }
+
+    peer.on('open', (id) => {
+        if(isHost) {
+            // Sadece kurucuda ID'yi göster
+            document.getElementById("id-area").innerText = "ODA ID: " + id;
+        } else {
+            // Katılan tarafta ID yazısını gizle ve ID sor
+            document.getElementById("id-area").style.display = "none";
+            const targetId = prompt("KATILMAK İSTEDİĞİNİZ ODA ID:");
+            if(targetId) {
+                conn = peer.connect(targetId);
+                setupConn();
+            } else {
+                location.reload();
+            }
+        }
     });
-    peer.on('connection', (c) => { conn = c; setupConn(); addMsg("lobby-chat", "Rakip bağlandı!"); if(isHost) document.getElementById("start-btn").style.display = "block"; });
+
+    peer.on('connection', (c) => {
+        conn = c;
+        setupConn();
+        addMsg("lobby-chat", "SİSTEM: Rakip bağlandı!");
+        if(isHost) document.getElementById("start-btn").style.display = "block";
+    });
+
+    peer.on('error', (err) => {
+        alert("Bağlantı Hatası: " + err.type);
+        location.reload();
+    });
 }
 
 function setupConn() {
+    conn.on('open', () => {
+        if(!isHost) addMsg("lobby-chat", "SİSTEM: Odaya bağlanıldı!");
+    });
     conn.on('data', (data) => {
         if(data.type === 'start') runStartCountdown();
         if(data.type === 'move') p2.x = canvas.width - data.x - pW;
@@ -175,7 +195,6 @@ const handleMsg = (e, boxId) => {
         e.target.value = "";
     }
 };
-
 document.getElementById("lobby-input").onkeypress = (e) => handleMsg(e, "lobby-chat");
 document.getElementById("ht-input").onkeypress = (e) => handleMsg(e, "ht-chat");
 
@@ -231,7 +250,6 @@ function gameLoop() {
             if(ball.x <= ball.r || ball.x >= canvas.width - ball.r) ball.dx *= -1;
             if(ball.y + ball.r > canvas.height - 35 && ball.x > p1.x && ball.x < p1.x + pW) ball.dy = -Math.abs(ball.dy);
             if(ball.y - ball.r < 35 + pH && ball.x > p2.x && ball.x < p2.x + pW) ball.dy = Math.abs(ball.dy);
-            
             if(!scoreLock) {
                 if(ball.y < 0) { score1++; checkScore(); }
                 else if(ball.y > canvas.height) { score2++; checkScore(); }
@@ -249,7 +267,6 @@ function checkScore() {
     scoreLock = true;
     updateScoreUI();
     if(conn) conn.send({type: 'score', s1: score1, s2: score2});
-
     if((score1 === 3 || score2 === 3) && !htDone) {
         htDone = true; isHalftime = true;
         document.getElementById("halftime-layer").style.display = "flex";
@@ -259,11 +276,7 @@ function checkScore() {
         setTimeout(startCountdownTimer, 500);
     }
 }
-
-function updateScoreUI() {
-    document.getElementById("s1-val").innerText = score1;
-    document.getElementById("s2-val").innerText = score2;
-}
+function updateScoreUI() { document.getElementById("s1-val").innerText = score1; document.getElementById("s2-val").innerText = score2; }
 
 const setupBtn = (id, val) => {
     const el = document.getElementById(id);
@@ -274,4 +287,4 @@ setupBtn("btn-left", -10); setupBtn("btn-right", 10);
 requestAnimationFrame(gameLoop);
 </script>
 </body>
-                                                                                   </html>
+        </html>
